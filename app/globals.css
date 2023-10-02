@@ -19,9 +19,35 @@
 body {
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+    to bottom,
+    transparent,
+    rgb(var(--background-end-rgb))
+  )
+  rgb(var(--background-start-rgb));
+}
+
+button {
+  height: 48px;
+  cursor: pointer;
+  min-width: 100px;
+  border-radius: 6px;
+}
+
+#main-container {
+  min-height: calc(100vh - 100px);
+}
+
+/* Custom css to style next and prev buttons of swiper js */
+.swiper-button-next,
+.swiper-button-prev {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 50% !important;
+  background: #ffffff;
+}
+
+.swiper-button-next::after,
+.swiper-button-prev::after {
+  color: black;
+  transform: scale(.4);
 }
