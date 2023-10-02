@@ -17,6 +17,9 @@ export async function GET(request: NextRequest) {
             },
             select: {
                 bookmarks: {
+                    where: {
+                        deletedAt: null
+                    },
                     select: {
                         book: {
                             include: {

@@ -25,7 +25,7 @@ export default async function Book({ params }: {params: {id: number}}) {
                     <div className="min-w-[200px] m-auto md:m-0">
                         <Image src={book?.volumeInfo?.imageLinks?.thumbnail ?? book.coverPage} width={200} height={100} alt="" className="rounded-r-xl shadow-md"/>
                     </div>
-                    <div>
+                    <div className="w-full">
                         <div className={`pb-4 ${lato.className}`}>
                             <div className="flex justify-between">
                                 <div>

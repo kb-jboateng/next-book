@@ -1,8 +1,9 @@
 "use client";
 
-import { useSession } from "next-auth/react";
-import { createContext, useContext, useEffect, useState } from "react";
 import { IDbBook } from "../models/Book";
+import { useSession } from "next-auth/react";
+import { fetchBookmarks } from "../services/book.service";
+import { createContext, useContext, useEffect, useReducer, useState } from "react";
 
 const BookContext = createContext<{
     user: any,
@@ -10,6 +11,7 @@ const BookContext = createContext<{
     setSearch: any,
     books: IDbBook[],
     setBooks: any,
+    bookmarks: IDbBook[] | null,
     busy: boolean,
     setBusy: any,
     isLoggedIn: boolean
@@ -19,10 +21,45 @@ const BookContext = createContext<{
     setSearch: null,
     books: [],
     setBooks: null,
+    bookmarks: null,
     busy: false,
     setBusy: null,
     isLoggedIn: false
 });
+
+interface IBookmarkAction {
+    type: 'set' | 'add' | 'delete';
+    bookId?: number;
+    book?: IDbBook;
+    data?: IDbBook[];
+}
+
+const BookmarkReducerContext = createContext<{ dispatch: (_: IBookmarkAction) => void }>({
+    dispatch: () => {}
+});
+
+function BookmarkReducer(bookmarks: IDbBook[], action: IBookmarkAction) {
+    
+    const { type, bookId, data, book } = action;
+
+    switch (type) {
+        case 'set':
+            if (data)
+                return [...data];
+            break;
+        case 'add':
+            if (book)
+                return [...bookmarks, book];
+            break;
+        case 'delete':
+            if (bookId)
+                return bookmarks.filter(bookmark => bookmark.id !== bookId);
+            break;
+    }
+
+    return bookmarks;
+}
+
 
 export const BookProvider = ({ children }: { children: React.ReactNode }) => {
 
@@ -32,13 +69,26 @@ export const BookProvider = ({ children }: { children: React.ReactNode }) => {
     const [busy, setBusy] = useState(false);
     const [search, setSearch] = useState('');
     const [user, setUser] = useState<any>(null);
+    const [bookmarks, dispatch] = useReducer(BookmarkReducer, []);
 
     useEffect(() => {
-        setUser(session?.user)
+        setUser(session?.user);
     }, [session]);
 
     const isLoggedIn = status == 'authenticated';
 
+    useEffect(() => {
+        if (isLoggedIn && bookmarks?.length == 0) {
+            const getUserBookmarks = async () => {
+                setBusy(true);
+                const bookmarks = await fetchBookmarks();
+                dispatch({type: 'set', data: bookmarks});
+                setBusy(false);
+            };
+
+            getUserBookmarks().catch(console.error);
+        }
+    }, [isLoggedIn, bookmarks, setBusy])
 
     const values = {
         user,
@@ -46,6 +96,7 @@ export const BookProvider = ({ children }: { children: React.ReactNode }) => {
         setSearch,
         books,
         setBooks,
+        bookmarks,
         busy,
         setBusy,
         isLoggedIn,
@@ -53,10 +104,13 @@ export const BookProvider = ({ children }: { children: React.ReactNode }) => {
 
     return (
         <BookContext.Provider value={values}>
-            {children}
+            <BookmarkReducerContext.Provider value={{dispatch}}>
+                {children}
+            </BookmarkReducerContext.Provider>
         </BookContext.Provider>
     )
 
 }
 
-export const useBookContext=()=> useContext(BookContext);
+export const useBookContext = ()=> useContext(BookContext);
+export const useBookmarkReducer = () => useContext(BookmarkReducerContext);

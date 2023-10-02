@@ -2,7 +2,7 @@
 
 import { FC, useState } from "react";
 import { IDbBook } from "../models/Book";
-import { useBookContext } from "../context/BookContext";
+import { useBookContext, useBookmarkReducer } from "../context/BookContext";
 import { bookmark, unbookmark } from "../services/book.service";
 
 interface Bookmark {
@@ -18,10 +18,10 @@ const Bookmark: FC<Bookmark> = ({
 }) => {
 
     const [bookCopy, setBookCopy] = useState<IDbBook>(book);
+    const { isLoggedIn, bookmarks } = useBookContext();
+    const { dispatch } = useBookmarkReducer();
 
-    const { isLoggedIn } = useBookContext();
-
-    const isBookmarked = bookCopy?.bookmarks?.length > 0;
+    const isBookmarked = bookCopy?.bookmarks?.length > 0 || !!bookmarks?.find(bookmark => bookmark.id === book.id);
 
     const onBookmark = (event: any) => {
         event.stopPropagation();
@@ -30,9 +30,13 @@ const Bookmark: FC<Bookmark> = ({
             if (isBookmarked) {
                 await unbookmark(bookCopy.bookmarks[0].id);
                 setBookCopy({...bookCopy, bookmarks: []});
+                dispatch({type: 'delete', bookId: bookCopy.id});
+
             } else {
                 const dbBookmark = await bookmark(book.id);
-                setBookCopy({...bookCopy, bookmarks: [dbBookmark]});
+                const toAdd = {...bookCopy, bookmarks: [dbBookmark]};
+                setBookCopy(toAdd);
+                dispatch({type: 'add', book: toAdd});
             }
         }
 

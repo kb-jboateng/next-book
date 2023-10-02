@@ -7,6 +7,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from "swiper/modules";
 import "swiper/swiper-bundle.css";
 import { fetchBookmarks } from "../services/book.service";
+import { useBookContext, useBookmarkReducer } from "../context/BookContext";
 
 interface BookSectionProps {
     title: string;
@@ -15,22 +16,35 @@ interface BookSectionProps {
     errorString: string;
     emptyTitle: string;
     emptySubTitle: string;
+    books: IDbBook[] | null;
+    setBooks?: any;
 }
 
 export default function Home() {
 
+    const { bookmarks } = useBookContext();
+    const { dispatch } = useBookmarkReducer();
+
+    const setBookmarks = (bookmarks: IDbBook[]) => {
+        dispatch({type: 'set', data: bookmarks});
+    };
+
     return (
-        <div>
+        <>
             <div>
-                <BookSection
-                    title="Bookmarks"
-                    qKey="bookmarks"
-                    func={fetchBookmarks}
-                    errorString="Failed to load bookmarks"
-                    emptyTitle="Found anything you like?"
-                    emptySubTitle="During your search bookmark books to save them for later and they&apos;d be here!"/>
+                <div>
+                    <BookSection
+                        title="Bookmarks"
+                        qKey="bookmarks"
+                        func={fetchBookmarks}
+                        books={bookmarks}
+                        setBooks={setBookmarks}
+                        errorString="Failed to load bookmarks"
+                        emptyTitle="Found anything you like?"
+                        emptySubTitle="During your search bookmark books to save them for later and they&apos;d be here!"/>
+                </div>
             </div>
-        </div>
+        </>
     )
 }
 
@@ -43,8 +57,18 @@ export default function Home() {
  * @param emptyTitle title of `empty` section displayed if `books = []`
  * @param emptySubTitle subtitle of `empty` section displayed if `books = []`
  */
-function BookSection({title, qKey, func, errorString, emptyTitle, emptySubTitle} : BookSectionProps) {
-    const { data: books, isLoading, error } = useQuery<IDbBook[]>([qKey], func);
+function BookSection({
+    title, 
+    qKey, 
+    func,
+    books,
+    setBooks,
+    errorString, 
+    emptyTitle, 
+    emptySubTitle
+} : BookSectionProps) {
+
+    const { data, isLoading, isSuccess, error } = useQuery<IDbBook[]>([qKey], func, {  enabled: books ? books.length > 0 : false });
 
     // create an empty array with length of 6
     const loadingArray = Array(6).fill(null);
@@ -73,7 +97,11 @@ function BookSection({title, qKey, func, errorString, emptyTitle, emptySubTitle}
             <div className="text-center">
                 <p className="text-gray-lighter">{errorString}</p>
             </div>
-        )
+        );
+    }
+    
+    if (isSuccess && books?.length == 0 && setBooks) {
+        setBooks(data);
     }
 
     return (
@@ -123,14 +151,14 @@ function BookList({ books } : { books: IDbBook[] }) {
                     slidesPerView: 8.5
                 }
             }}
-            >
-                {
-                    books.map((book) =>
-                        <SwiperSlide key={book.id}>
-                            <BookCard key={book.id} book={book} width="w-full"/>
-                        </SwiperSlide>
-                    )
-                }
+        >
+            {
+                books.map((book) =>
+                    <SwiperSlide key={book.id}>
+                        <BookCard key={book.id} book={book} width="w-full"/>
+                    </SwiperSlide>
+                )
+            }
         </Swiper>
     )
 }
