@@ -11,7 +11,9 @@ const BookContext = createContext<{
     setSearch: any,
     books: IDbBook[],
     setBooks: any,
-    bookmarks: IDbBook[] | null,
+    topRatedBooks: IDbBook[];
+    setTopRatedBooks: any;
+    bookmarks: IDbBook[],
     busy: boolean,
     setBusy: any,
     isLoggedIn: boolean
@@ -21,7 +23,9 @@ const BookContext = createContext<{
     setSearch: null,
     books: [],
     setBooks: null,
-    bookmarks: null,
+    topRatedBooks: [],
+    setTopRatedBooks: null,
+    bookmarks: [],
     busy: false,
     setBusy: null,
     isLoggedIn: false
@@ -69,6 +73,7 @@ export const BookProvider = ({ children }: { children: React.ReactNode }) => {
     const [busy, setBusy] = useState(false);
     const [search, setSearch] = useState('');
     const [user, setUser] = useState<any>(null);
+    const [topRatedBooks, setTopRatedBooks] = useState([]);
     const [bookmarks, dispatch] = useReducer(BookmarkReducer, []);
 
     useEffect(() => {
@@ -97,6 +102,8 @@ export const BookProvider = ({ children }: { children: React.ReactNode }) => {
         books,
         setBooks,
         bookmarks,
+        topRatedBooks,
+        setTopRatedBooks,
         busy,
         setBusy,
         isLoggedIn,

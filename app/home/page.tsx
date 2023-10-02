@@ -6,23 +6,24 @@ import BookCard from "../components/BookCard";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from "swiper/modules";
 import "swiper/swiper-bundle.css";
-import { fetchBookmarks } from "../services/book.service";
+import { fetchBookmarks, fetchTopRated } from "../services/book.service";
 import { useBookContext, useBookmarkReducer } from "../context/BookContext";
+import { useEffect } from "react";
 
 interface BookSectionProps {
     title: string;
     qKey: string;
     func: any;
+    books: IDbBook[];
+    setBooks: any;
     errorString: string;
-    emptyTitle: string;
-    emptySubTitle: string;
-    books: IDbBook[] | null;
-    setBooks?: any;
+    emptyTitle?: string;
+    emptySubTitle?: string;
 }
 
 export default function Home() {
 
-    const { bookmarks } = useBookContext();
+    const { bookmarks, topRatedBooks, setTopRatedBooks } = useBookContext();
     const { dispatch } = useBookmarkReducer();
 
     const setBookmarks = (bookmarks: IDbBook[]) => {
@@ -32,17 +33,23 @@ export default function Home() {
     return (
         <>
             <div>
-                <div>
-                    <BookSection
-                        title="Bookmarks"
-                        qKey="bookmarks"
-                        func={fetchBookmarks}
-                        books={bookmarks}
-                        setBooks={setBookmarks}
-                        errorString="Failed to load bookmarks"
-                        emptyTitle="Found anything you like?"
-                        emptySubTitle="During your search bookmark books to save them for later and they&apos;d be here!"/>
-                </div>
+                <BookSection
+                    title="Bookmarks"
+                    qKey="bookmarks"
+                    func={fetchBookmarks}
+                    books={bookmarks}
+                    setBooks={setBookmarks}
+                    errorString="Failed to load bookmarks"
+                    emptyTitle="Found anything you like?"
+                    emptySubTitle="During your search bookmark books to save them for later and they&apos;d be here!"/>
+
+                <BookSection
+                    title="Top Rated"
+                    qKey="top-rated"
+                    func={fetchTopRated}
+                    books={topRatedBooks}
+                    setBooks={setTopRatedBooks}
+                    errorString="Failed to load top rated book"/>
             </div>
         </>
     )
@@ -68,14 +75,19 @@ function BookSection({
     emptySubTitle
 } : BookSectionProps) {
 
-    const { data, isLoading, isSuccess, error } = useQuery<IDbBook[]>([qKey], func, {  enabled: books ? books.length > 0 : false });
+    const { data, isLoading, isSuccess, error } = useQuery<IDbBook[]>([qKey], func, {  enabled: books.length === 0 });
+
+    useEffect(() => {
+        if (data && setBooks && books.length == 0)
+            setBooks(data)
+    }, [data, setBooks, books]);
 
     // create an empty array with length of 6
     const loadingArray = Array(6).fill(null);
 
     if (isLoading) {
         return (
-            <>
+            <div className="pb-8">
                 <div className="animate-pulse pb-4">
                     <div className="h-6 w-40 rounded bg-gray-light"></div>
                 </div>
@@ -88,39 +100,43 @@ function BookSection({
                         )
                     }
                 </div>
-            </>
+            </div>
         )
     }
 
     if (error) {
         return (
-            <div className="text-center">
-                <p className="text-gray-lighter">{errorString}</p>
+            <div className="pb-8">
+                <div className="pb-4">
+                    <h2 className="text-2xl">{title}</h2>
+                </div>
+                <div className="text-center">
+                    <p className="text-gray-lighter">{errorString}</p>
+                </div>
             </div>
         );
-    }
-    
-    if (isSuccess && books?.length == 0 && setBooks) {
-        setBooks(data);
     }
 
     return (
         <>
             {
-                books && books.length > 0 ?
-                (
-                    <>
-                        <div className="pb-4">
-                            <h2 className="text-2xl">{title}</h2>
-                        </div>
-                        <BookList books={books}/>
-                    </>
-                ) :
-                <div className="flex justify-center">
-                    <div className="text-center md:max-w-[300px]">
-                        <h3 className="text-xl pb-4">{emptyTitle}</h3>
-                        <p className="text-base text-gray-lighter">{emptySubTitle}</p>
+                (books && books.length > 0 || (books?.length == 0 && (emptyTitle || emptySubTitle))) &&
+                <div className="pb-8">
+                    <div className="pb-4">
+                        <h2 className="text-2xl">{title}</h2>
                     </div>
+                    {
+                        books.length > 0 ?
+                        (
+                            <BookList books={books}/>
+                        ) :
+                        <div className="flex justify-center">
+                            <div className="text-center md:max-w-[300px]">
+                                <h3 className="text-xl pb-4">{emptyTitle}</h3>
+                                <p className="text-base text-gray-lighter">{emptySubTitle}</p>
+                            </div>
+                        </div>
+                    }
                 </div>
             }
         </>

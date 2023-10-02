@@ -81,3 +81,10 @@ export const unbookmark = async (bookmarkId: number) => {
 export const fetchBookmarks = async (): Promise<IDbBook[]> => {
     return await fetchData(`${BOOKS_URL}/bookmark`);
 };
+
+/**
+ * @returns top rated books in descending order of `averageRating` and `numberOfRatings`
+ */
+export const fetchTopRated = async () : Promise<IDbBook[]> => {
+    return await fetchData(`${BOOKS_URL}/top-rated`);
+};
