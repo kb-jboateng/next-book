@@ -11,3 +11,10 @@ export const getUser = cache(async (req: NextRequest): Promise<JWT> => {
 
     return session;
 });
+
+// work around for BIGINT not being JSON serializable
+export const serializeData = cache((data: any) => {
+    return JSON.stringify(data, (key, value) =>
+      typeof value === 'bigint' ? value.toString() : value,
+    );
+});

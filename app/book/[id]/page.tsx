@@ -12,7 +12,7 @@ export default async function Book({ params }: {params: {id: number}}) {
 
     const fetchBook = async () : Promise<IBook> => {
         const res = await fetch(`${process.env.NEXTAUTH_URL}/api/books/${+params.id}`);
-        return await res.json();
+        return JSON.parse(await res.json());
     }
 
     const book = await fetchBook();

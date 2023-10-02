@@ -1,11 +1,6 @@
 import prisma from "@/app/utils/db";
 import { NextRequest, NextResponse } from "next/server";
-import { getUser } from "@/app/api/utils";
-
-BigInt.prototype.toJSON = function () {
-    const int = Number.parseInt(this.toString());
-    return int ?? this.toString();
-};
+import { getUser, serializeData } from "@/app/api/utils";
 
 export async function GET(request: NextRequest) {
     try {
@@ -36,7 +31,7 @@ export async function GET(request: NextRequest) {
             return bookmark.book;
         });
 
-        return NextResponse.json(bookmarks);
+        return NextResponse.json(serializeData(bookmarks));
     } catch (error: any) {
         if (error?.message == "Unauthorized") {
             return NextResponse.json("Unauthorized", { status: 401 });

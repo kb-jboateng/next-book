@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/app/utils/db";
 import { IGoogleBook } from "@/app/models/Book";
+import { serializeData } from "../../utils";
 
 const BOOKS_URL = process.env.GOOGLE_BOOKS_URL;
 const BOOKS_KEY = process.env.GOOGLE_BOOKS_KEY;
@@ -32,7 +33,7 @@ export async function GET(request: Request, { params }: { params: { id: number }
             delete gBook.id;
         }
                     
-        return NextResponse.json({...dbBook, ...gBook});
+        return NextResponse.json(serializeData({...dbBook, ...gBook}));
     } catch (error: any) {
         return NextResponse.json({ error }, { status: 500 });
     }

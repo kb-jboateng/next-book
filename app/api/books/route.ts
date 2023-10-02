@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/utils/db";
-import { getUser } from "../utils";
-
-BigInt.prototype.toJSON = function () {
-    const int = Number.parseInt(this.toString());
-    return int ?? this.toString();
-};
+import { getUser, serializeData } from "../utils";
 
 export async function GET(request: NextRequest) {
     const user = await getUser(request);
@@ -45,7 +40,7 @@ export async function GET(request: NextRequest) {
             }
         
             const books = await prisma.book.findMany(prismaQuery);
-            return NextResponse.json(books);
+            return NextResponse.json(serializeData(books));
         }
         return NextResponse.json([]);
     } catch (error: any) {

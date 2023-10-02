@@ -34,7 +34,9 @@ const fetchData = async (url: string, options: RequestOptions = DefaultOptions) 
     if (response.ok && options?.method == 'DELETE')
         return null;
 
-    return await response.json();
+    const data =  await response.json();
+
+    return JSON.parse(data);
 };
 
 /**
@@ -83,7 +85,7 @@ export const fetchBookmarks = async (): Promise<IDbBook[]> => {
 };
 
 /**
- * @returns top rated books in descending order of `averageRating` and `numberOfRatings`
+ * @returns top rated books in descending order of `averageRating`
  */
 export const fetchTopRated = async () : Promise<IDbBook[]> => {
     return await fetchData(`${BOOKS_URL}/top-rated`);
