@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/utils/db";
-import { getUser, serializeData } from "../utils";
+import { serializeData } from "../utils";
+import { getToken } from "next-auth/jwt";
 
 export async function GET(request: NextRequest) {
-    const user = await getUser(request);
+    const user = await getToken({ req: request });
     const searchParams = request.nextUrl.searchParams;
 
     const query: string | null = searchParams.get('query');

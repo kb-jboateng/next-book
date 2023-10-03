@@ -19,7 +19,7 @@ export default function Books() {
             <div className="pt-8">
                 {
                     books.length > 0 ?
-                    <div className="flex flex-wrap gap-2.5">
+                    <div className="flex flex-wrap justify-center gap-2.5">
                         {books.map((book) => 
                             <BookCard key={book.id} book={book}/>
                         )}
