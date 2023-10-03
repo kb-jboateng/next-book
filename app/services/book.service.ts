@@ -25,7 +25,6 @@ const DefaultOptions: RequestOptions = {
  * @returns JSON response if there's no error. `null` when method is `DELETE` and throws an error if an error occured during api call
  */
 const fetchData = async (url: string, options: RequestOptions = DefaultOptions) : Promise<any> => {
-    console.log('fetching', url)
     const response = await fetch(url, options);
 
     if(!response.ok)
@@ -89,4 +88,11 @@ export const fetchBookmarks = async (): Promise<IDbBook[]> => {
  */
 export const fetchTopRated = async () : Promise<IDbBook[]> => {
     return await fetchData(`${BOOKS_URL}/top-rated`);
+};
+
+/**
+ * @returns popular books in descending order of the `numberOfRatings` and `averageRating`
+ */
+export const fetchPopular = async () : Promise<IDbBook[]> => {
+    return await fetchData(`${BOOKS_URL}/popular`);
 };

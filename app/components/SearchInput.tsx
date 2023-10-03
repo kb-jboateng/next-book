@@ -33,7 +33,6 @@ const SearchInput : FC<InputProps> = ({
 
     const delaySetValue = useRef(
         debounce((text: string) => {
-            console.log('text value', text)
             setValue(text);
         }, delay)
     ).current;
@@ -76,7 +75,7 @@ const SearchInput : FC<InputProps> = ({
                 placeholder={placeholder}/>
             {
                 (value && !busy) &&
-                <div  className=" cursor-pointer" onClick={clearInput}>
+                <div className="cursor-pointer" onClick={clearInput}>
                     <ClearIcon/>
                 </div>                
             }

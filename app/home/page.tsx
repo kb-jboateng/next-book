@@ -6,7 +6,7 @@ import BookCard from "../components/BookCard";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from "swiper/modules";
 import "swiper/swiper-bundle.css";
-import { fetchBookmarks, fetchTopRated } from "../services/book.service";
+import { fetchBookmarks, fetchPopular, fetchTopRated } from "../services/book.service";
 import { useBookContext, useBookmarkReducer } from "../context/BookContext";
 import { useEffect } from "react";
 
@@ -23,7 +23,7 @@ interface BookSectionProps {
 
 export default function Home() {
 
-    const { bookmarks, topRatedBooks, setTopRatedBooks } = useBookContext();
+    const { bookmarks, topRatedBooks, setTopRatedBooks, popularBooks, setPopularBooks } = useBookContext();
     const { dispatch } = useBookmarkReducer();
 
     const setBookmarks = (bookmarks: IDbBook[]) => {
@@ -49,7 +49,15 @@ export default function Home() {
                     func={fetchTopRated}
                     books={topRatedBooks}
                     setBooks={setTopRatedBooks}
-                    errorString="Failed to load top rated book"/>
+                    errorString="Failed to load top rated books"/>
+
+                <BookSection
+                    title="Popular"
+                    qKey="popular"
+                    func={fetchPopular}
+                    books={popularBooks}
+                    setBooks={setPopularBooks}
+                    errorString="Failed to load popular books"/>
             </div>
         </>
     )
@@ -79,7 +87,7 @@ function BookSection({
 
     useEffect(() => {
         if (data && setBooks && books.length == 0)
-            setBooks(data)
+            setBooks(data);
     }, [data, setBooks, books]);
 
     // create an empty array with length of 6
