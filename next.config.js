@@ -30,6 +30,10 @@ const nextConfig = {
             {
                 protocol: 'http',
                 hostname: '**.com'
+            },
+            {
+                protocol: 'https',
+                hostname: '**'
             }
         ]
     }
