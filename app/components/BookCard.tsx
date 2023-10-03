@@ -22,7 +22,7 @@ const BookCard: FC<BookProps> = ({
             <div className="absolute top-2 right-2">
                 <Bookmark book={book}/>
             </div>
-            <Link  href={`/books/${book.id}`}>
+            <Link  href={`/books/${book.id}`} prefetch={false}>
                 <img src={book.coverPage} alt="Book image" className={`${height} ${width}`}/>
             </Link>
         </div>
