@@ -4,10 +4,19 @@ import Image from "next/image";
 import BookCard from "../components/BookCard"
 import Search from "../components/Search";
 import { useBookContext } from "../context/BookContext";
+import { useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 
 export default function Books() {
 
-    const { books, busy, search } = useBookContext();
+    const params = useSearchParams();
+    const q = params.get('q');
+    const { books, busy, search, setSearch } = useBookContext();
+
+    useEffect(() => {
+        if (q)
+            setSearch(q);
+    }, [q, setSearch]);
 
     return (
         <>

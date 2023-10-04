@@ -86,7 +86,7 @@ function NavSearch({ isBooksPage }: { isBooksPage: boolean }) {
 
     const handleViewAll = (event: MouseEvent) => {
         setIsOpen(false);
-        router.push('/books');
+        router.push(`/books?q=${search}`);
         event.stopPropagation();
     };
 
